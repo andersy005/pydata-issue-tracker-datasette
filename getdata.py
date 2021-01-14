@@ -3,6 +3,7 @@ import os
 import collections
 import pandas as pd
 import datetime
+import pathlib
 
 
 headers = {'Authorization': f"token {os.environ['GH_TOKEN']}"}
@@ -28,9 +29,9 @@ def run_query(
 
 if __name__ == '__main__':
 
-    now = datetime.datetime.now().replace(second=0, microsecond=0)
+    now = datetime.datetime.now().replace(second=0, microsecond=0).timestamp()
     Project = collections.namedtuple('Project', ['org', 'repo'])
-    data_file = './data/data.csv'
+    data_file = pathlib.Path('./data/data.csv')
 
     projects = [
         Project('pydata', 'xarray'),
@@ -87,9 +88,10 @@ if __name__ == '__main__':
     if old_df.empty:
         pass
     else:
-        df = pd.concat(old_df, df)
+        df = pd.concat([old_df, df])
     df = df.drop_duplicates(subset=['project', 'time']).sort_values(by='time')
     print(df.head())
     print(df.tail())
     print(f'Length of dataframe: {len(df)}')
     df.to_csv(data_file, index=False)
+    print(f'File size in bytes: {data_file.stat().st_size}')
