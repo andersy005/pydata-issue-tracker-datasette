@@ -29,7 +29,7 @@ def run_query(
 
 if __name__ == '__main__':
 
-    now = datetime.datetime.now().replace(second=0, microsecond=0).timestamp()
+    now = int(datetime.datetime.now().replace(second=0, microsecond=0).timestamp())
     Project = collections.namedtuple('Project', ['org', 'repo'])
     data_file = pathlib.Path('./data/data.csv')
 
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     states = [('OPEN', 'OPEN'), ('CLOSED', 'MERGED')]
     data = []
     for project in projects:
-        entry = {'project': f'{project.org}/{project.repo}', 'time': now}
+        entry = {'project': f'{project.org}/{project.repo}', 'timestamp': now}
         for items in states:
             query = """
                         query($org:String!, $repo:String!, $issue_state:[IssueState!], $pr_state:[PullRequestState!]){
@@ -89,7 +89,7 @@ if __name__ == '__main__':
         pass
     else:
         df = pd.concat([old_df, df])
-    df = df.drop_duplicates(subset=['project', 'time']).sort_values(by='time')
+    df = df.drop_duplicates(subset=['project', 'timestamp']).sort_values(by='timestamp')
     print(df.head())
     print(df.tail())
     print(f'Length of dataframe: {len(df)}')

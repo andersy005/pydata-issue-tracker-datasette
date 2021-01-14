@@ -1,6 +1,1 @@
-project,time,open_issues,open_pull_requests,closed_issues,merged_pull_requests
-pydata/xarray,1610604660.0,686,96,1873,1949
-dask/dask,1610604660.0,637,73,2790,3163
-dask/distributed,1610604660.0,596,109,1255,2172
-numpy/numpy,1610604660.0,1979,253,7240,7055
-pandas-dev/pandas,1610604660.0,3437,137,16291,14603
+project,timestamp,open_issues,open_pull_requests,closed_issues,merged_pull_requests
