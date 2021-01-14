@@ -5,7 +5,7 @@ import pandas as pd
 import datetime
 
 
-headers = {'Authorization': f"token {os.environ['GITHUB_TOKEN']}"}
+headers = {'Authorization': f"token {os.environ['GH_TOKEN']}"}
 
 
 def run_query(
