@@ -39,6 +39,8 @@ if __name__ == '__main__':
         Project('dask', 'distributed'),
         Project('numpy', 'numpy'),
         Project('pandas-dev', 'pandas'),
+        Project('jupyterlab', 'jupyterlab'),
+        Project('matplotlib', 'matplotlib'),
     ]
     states = [('OPEN', 'OPEN'), ('CLOSED', 'MERGED')]
     data = []
@@ -94,4 +96,5 @@ if __name__ == '__main__':
     print(df.tail())
     print(f'Length of dataframe: {len(df)}')
     df.to_csv(data_file, index=False)
+    df.to_json('./data/test.json', orient='records')
     print(f'File size in bytes: {data_file.stat().st_size}')
