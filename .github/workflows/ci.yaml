@@ -3,6 +3,7 @@ name: collect-data
 on:
   schedule:
     - cron: '0 */8 * * *' # "At minute 0 past every 8th hour."
+  workflow_dispatch:
   # push:
   #   branches:
   #     - main
