@@ -1,0 +1,432 @@
+[
+  {
+    "date": 1610928000000,
+    "type": "open_issues",
+    "count": 598
+  },
+  {
+    "date": 1610928000000,
+    "type": "open_pull_requests",
+    "count": 111
+  },
+  {
+    "date": 1611532800000,
+    "type": "open_issues",
+    "count": 604
+  },
+  {
+    "date": 1611532800000,
+    "type": "open_pull_requests",
+    "count": 109
+  },
+  {
+    "date": 1612137600000,
+    "type": "open_issues",
+    "count": 608
+  },
+  {
+    "date": 1612137600000,
+    "type": "open_pull_requests",
+    "count": 113
+  },
+  {
+    "date": 1612742400000,
+    "type": "open_issues",
+    "count": 611
+  },
+  {
+    "date": 1612742400000,
+    "type": "open_pull_requests",
+    "count": 111
+  },
+  {
+    "date": 1613347200000,
+    "type": "open_issues",
+    "count": 618
+  },
+  {
+    "date": 1613347200000,
+    "type": "open_pull_requests",
+    "count": 117
+  },
+  {
+    "date": 1613952000000,
+    "type": "open_issues",
+    "count": 631
+  },
+  {
+    "date": 1613952000000,
+    "type": "open_pull_requests",
+    "count": 120
+  },
+  {
+    "date": 1614556800000,
+    "type": "open_issues",
+    "count": 635
+  },
+  {
+    "date": 1614556800000,
+    "type": "open_pull_requests",
+    "count": 116
+  },
+  {
+    "date": 1615161600000,
+    "type": "open_issues",
+    "count": 638
+  },
+  {
+    "date": 1615161600000,
+    "type": "open_pull_requests",
+    "count": 114
+  },
+  {
+    "date": 1615766400000,
+    "type": "open_issues",
+    "count": 638
+  },
+  {
+    "date": 1615766400000,
+    "type": "open_pull_requests",
+    "count": 112
+  },
+  {
+    "date": 1616371200000,
+    "type": "open_issues",
+    "count": 638
+  },
+  {
+    "date": 1616371200000,
+    "type": "open_pull_requests",
+    "count": 109
+  },
+  {
+    "date": 1616976000000,
+    "type": "open_issues",
+    "count": 643
+  },
+  {
+    "date": 1616976000000,
+    "type": "open_pull_requests",
+    "count": 110
+  },
+  {
+    "date": 1617580800000,
+    "type": "open_issues",
+    "count": 646
+  },
+  {
+    "date": 1617580800000,
+    "type": "open_pull_requests",
+    "count": 112
+  },
+  {
+    "date": 1618185600000,
+    "type": "open_issues",
+    "count": 649
+  },
+  {
+    "date": 1618185600000,
+    "type": "open_pull_requests",
+    "count": 116
+  },
+  {
+    "date": 1618790400000,
+    "type": "open_issues",
+    "count": 654
+  },
+  {
+    "date": 1618790400000,
+    "type": "open_pull_requests",
+    "count": 115
+  },
+  {
+    "date": 1619395200000,
+    "type": "open_issues",
+    "count": 665
+  },
+  {
+    "date": 1619395200000,
+    "type": "open_pull_requests",
+    "count": 125
+  },
+  {
+    "date": 1620000000000,
+    "type": "open_issues",
+    "count": 668
+  },
+  {
+    "date": 1620000000000,
+    "type": "open_pull_requests",
+    "count": 128
+  },
+  {
+    "date": 1620604800000,
+    "type": "open_issues",
+    "count": 670
+  },
+  {
+    "date": 1620604800000,
+    "type": "open_pull_requests",
+    "count": 128
+  },
+  {
+    "date": 1621123200000,
+    "type": "open_issues",
+    "count": 674
+  },
+  {
+    "date": 1621123200000,
+    "type": "open_pull_requests",
+    "count": 132
+  },
+  {
+    "date": 1621814400000,
+    "type": "open_issues",
+    "count": 678
+  },
+  {
+    "date": 1621814400000,
+    "type": "open_pull_requests",
+    "count": 133
+  },
+  {
+    "date": 1622419200000,
+    "type": "open_issues",
+    "count": 685
+  },
+  {
+    "date": 1622419200000,
+    "type": "open_pull_requests",
+    "count": 126
+  },
+  {
+    "date": 1623024000000,
+    "type": "open_issues",
+    "count": 687
+  },
+  {
+    "date": 1623024000000,
+    "type": "open_pull_requests",
+    "count": 131
+  },
+  {
+    "date": 1623628800000,
+    "type": "open_issues",
+    "count": 687
+  },
+  {
+    "date": 1623628800000,
+    "type": "open_pull_requests",
+    "count": 135
+  },
+  {
+    "date": 1624233600000,
+    "type": "open_issues",
+    "count": 690
+  },
+  {
+    "date": 1624233600000,
+    "type": "open_pull_requests",
+    "count": 140
+  },
+  {
+    "date": 1624838400000,
+    "type": "open_issues",
+    "count": 706
+  },
+  {
+    "date": 1624838400000,
+    "type": "open_pull_requests",
+    "count": 141
+  },
+  {
+    "date": 1625443200000,
+    "type": "open_issues",
+    "count": 707
+  },
+  {
+    "date": 1625443200000,
+    "type": "open_pull_requests",
+    "count": 148
+  },
+  {
+    "date": 1626048000000,
+    "type": "open_issues",
+    "count": 713
+  },
+  {
+    "date": 1626048000000,
+    "type": "open_pull_requests",
+    "count": 151
+  },
+  {
+    "date": 1626652800000,
+    "type": "open_issues",
+    "count": 724
+  },
+  {
+    "date": 1626652800000,
+    "type": "open_pull_requests",
+    "count": 153
+  },
+  {
+    "date": 1627257600000,
+    "type": "open_issues",
+    "count": 720
+  },
+  {
+    "date": 1627257600000,
+    "type": "open_pull_requests",
+    "count": 152
+  },
+  {
+    "date": 1627862400000,
+    "type": "open_issues",
+    "count": 727
+  },
+  {
+    "date": 1627862400000,
+    "type": "open_pull_requests",
+    "count": 155
+  },
+  {
+    "date": 1628467200000,
+    "type": "open_issues",
+    "count": 734
+  },
+  {
+    "date": 1628467200000,
+    "type": "open_pull_requests",
+    "count": 161
+  },
+  {
+    "date": 1629072000000,
+    "type": "open_issues",
+    "count": 741
+  },
+  {
+    "date": 1629072000000,
+    "type": "open_pull_requests",
+    "count": 166
+  },
+  {
+    "date": 1629676800000,
+    "type": "open_issues",
+    "count": 748
+  },
+  {
+    "date": 1629676800000,
+    "type": "open_pull_requests",
+    "count": 169
+  },
+  {
+    "date": 1630281600000,
+    "type": "open_issues",
+    "count": 762
+  },
+  {
+    "date": 1630281600000,
+    "type": "open_pull_requests",
+    "count": 166
+  },
+  {
+    "date": 1630886400000,
+    "type": "open_issues",
+    "count": 760
+  },
+  {
+    "date": 1630886400000,
+    "type": "open_pull_requests",
+    "count": 165
+  },
+  {
+    "date": 1631491200000,
+    "type": "open_issues",
+    "count": 761
+  },
+  {
+    "date": 1631491200000,
+    "type": "open_pull_requests",
+    "count": 167
+  },
+  {
+    "date": 1632096000000,
+    "type": "open_issues",
+    "count": 763
+  },
+  {
+    "date": 1632096000000,
+    "type": "open_pull_requests",
+    "count": 171
+  },
+  {
+    "date": 1632700800000,
+    "type": "open_issues",
+    "count": 768
+  },
+  {
+    "date": 1632700800000,
+    "type": "open_pull_requests",
+    "count": 178
+  },
+  {
+    "date": 1633305600000,
+    "type": "open_issues",
+    "count": 773
+  },
+  {
+    "date": 1633305600000,
+    "type": "open_pull_requests",
+    "count": 170
+  },
+  {
+    "date": 1633910400000,
+    "type": "open_issues",
+    "count": 778
+  },
+  {
+    "date": 1633910400000,
+    "type": "open_pull_requests",
+    "count": 170
+  },
+  {
+    "date": 1634515200000,
+    "type": "open_issues",
+    "count": 750
+  },
+  {
+    "date": 1634515200000,
+    "type": "open_pull_requests",
+    "count": 171
+  },
+  {
+    "date": 1635120000000,
+    "type": "open_issues",
+    "count": 692
+  },
+  {
+    "date": 1635120000000,
+    "type": "open_pull_requests",
+    "count": 177
+  },
+  {
+    "date": 1635724800000,
+    "type": "open_issues",
+    "count": 697
+  },
+  {
+    "date": 1635724800000,
+    "type": "open_pull_requests",
+    "count": 184
+  },
+  {
+    "date": 1635724800000,
+    "type": "open_issues",
+    "count": 696
+  },
+  {
+    "date": 1635724800000,
+    "type": "open_pull_requests",
+    "count": 183
+  }
+]

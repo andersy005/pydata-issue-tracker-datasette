@@ -1,3 +1,4 @@
+
 import requests
 import os
 import collections
@@ -5,12 +6,13 @@ import pandas as pd
 import datetime
 import itertools
 import pathlib
-from prefect import Flow, task, unmapped
+from prefect import Flow, task, unmapped, Parameter
+from prefect.triggers import all_successful
 
 
 headers = {'Authorization': f"token {os.environ['GH_TOKEN']}"}
 
-@task
+@task(max_retries=3, retry_delay=datetime.timedelta(minutes=1))
 def get_repo_data(project, time):
     def run_query(
         query, variables={}
@@ -82,34 +84,52 @@ def merge_data(data):
 @task
 def save_data(data, data_file):
     try:
-        df = pd.read_json(data_file, parse_dates=['time'])
+        df = pd.read_json(data_file, convert_dates=['time'])
     except Exception:
         df = pd.DataFrame()
-
-
-    if not data.empty:
+    print(df.shape)
+    if not df.empty:
         data = pd.concat([df, data])
     data = data.drop_duplicates(subset=['project', 'time']).sort_values(by='time')
-    data.to_json(data_file, orient='records')
+    with open(data_file, 'w', encoding='utf-8') as outfile:
+      data.to_json(outfile, orient='records', indent=2, force_ascii=False)
 
 
-if __name__ == '__main__':
+def transform(row):
+    return [{'date': row.time.round('D'), 'type': 'open_issues', 'count': row.open_issues}, {'date': row.time.round('D'), 'type': 'open_pull_requests', 'count': row.open_pull_requests}]
 
-    with Flow('get_data') as flow:
 
-        Project = collections.namedtuple('Project', ['org', 'repo'])
-        projects = [
-        Project('pydata', 'xarray'),
-        Project('dask', 'dask'),
-        Project('dask', 'distributed'),
-        Project('numpy', 'numpy'),
-        Project('pandas-dev', 'pandas'),
-        Project('jupyterlab', 'jupyterlab'),
-        Project('matplotlib', 'matplotlib'),
-    ][:2]
 
-        time =  datetime.datetime.now()
-        data = get_repo_data.map(project=projects, time=unmapped(time))
-        data = merge_data(data)
-        save_data(data,data_file = pathlib.Path('./data/data.json').absolute())
-    output = flow.run()
+@task
+def save_project_weekly_data(project, path):
+    path = pathlib.Path(path)
+    columns= ['time', 'open_issues', 'open_pull_requests']
+    df = pd.read_json(path, convert_dates=['time'])
+    data = df[df.project == f'{project.org}/{project.repo}']
+    data = data[columns].groupby(data.time.dt.isocalendar().week).last()
+    results = pd.DataFrame(itertools.chain(*[transform(row) for _, row in data.iterrows()]))
+    outdir = path.parent / 'weekly'
+    outdir.mkdir(parents=True, exist_ok=True)
+    data_file = f'{outdir}/{project.repo}-weekly-data.json'
+    with open(data_file, 'w', encoding='utf-8') as outfile:
+      results.to_json(outfile, orient='records', indent=2, force_ascii=False)
+
+
+with Flow('get_data') as flow:
+
+    Project = collections.namedtuple('Project', ['org', 'repo'])
+    projects = [
+    Project('pydata', 'xarray'),
+    Project('dask', 'dask'),
+    Project('dask', 'distributed'),
+    Project('numpy', 'numpy'),
+    Project('pandas-dev', 'pandas'),
+    Project('jupyterlab', 'jupyterlab'),
+    Project('matplotlib', 'matplotlib'),
+]
+    path = Parameter('path', default=pathlib.Path('./data/data.json').absolute())
+    time =  datetime.datetime.now()
+    data = get_repo_data.map(project=projects, time=unmapped(time))
+    df = merge_data(data)
+    x = save_data(df, data_file = path)
+    save_project_weekly_data.map(project=projects, path=unmapped(path), upstream_tasks=[unmapped(x)])
