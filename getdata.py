@@ -3,52 +3,37 @@ import os
 import collections
 import pandas as pd
 import datetime
+import itertools
 import pathlib
+from prefect import Flow, task, unmapped
 
 
 headers = {'Authorization': f"token {os.environ['GH_TOKEN']}"}
 
-
-def run_query(
-    query, variables={}
-):  # A simple function to use requests.post to make the API call. Note the json= section.
-    request = requests.post(
-        'https://api.github.com/graphql',
-        json={'query': query, 'variables': variables},
-        headers=headers,
-    )
-    if request.status_code == 200:
-        return request.json()
-    else:
-        raise Exception(
-            'Query failed to run by returning code of {}. {}'.format(
-                request.status_code, query
-            )
+@task
+def get_repo_data(project, time):
+    def run_query(
+        query, variables={}
+    ):  # A simple function to use requests.post to make the API call. Note the json= section.
+        request = requests.post(
+            'https://api.github.com/graphql',
+            json={'query': query, 'variables': variables},
+            headers=headers,
         )
+        if request.status_code == 200:
+            return request.json()
+        else:
+            raise Exception(
+                'Query failed to run by returning code of {}. {}'.format(
+                    request.status_code, query
+                )
+            )
 
-
-if __name__ == '__main__':
-
-    now = int(datetime.datetime.now().replace(second=0, microsecond=0).timestamp())
-    Project = collections.namedtuple('Project', ['org', 'repo'])
-    data_file = pathlib.Path('./data/data.csv')
-
-    projects = [
-        Project('pydata', 'xarray'),
-        Project('dask', 'dask'),
-        Project('dask', 'distributed'),
-        Project('numpy', 'numpy'),
-        Project('pandas-dev', 'pandas'),
-        Project('jupyterlab', 'jupyterlab'),
-        Project('matplotlib', 'matplotlib'),
-    ]
+    entry = {'project': f'{project.org}/{project.repo}', 'time': time}
     states = [('OPEN', 'OPEN'), ('CLOSED', 'MERGED')]
     data = []
-    for project in projects:
-        entry = {'project': f'{project.org}/{project.repo}', 'timestamp': now}
-        for items in states:
-            query = """
-                        query($org:String!, $repo:String!, $issue_state:[IssueState!], $pr_state:[PullRequestState!]){
+    query = """
+                query($org:String!, $repo:String!, $issue_state:[IssueState!], $pr_state:[PullRequestState!]){
                 repository(owner: $org, name: $repo) {
                     issues(states: $issue_state) {
                     totalCount
@@ -59,42 +44,72 @@ if __name__ == '__main__':
                 }
                 }"""
 
-            result = run_query(
-                query,
-                variables={
-                    'org': project.org,
-                    'repo': project.repo,
-                    'issue_state': items[0],
-                    'pr_state': items[1],
-                },
-            )
+    for items in states:
+        result = run_query(
+            query,
+            variables={
+                'org': project.org,
+                'repo': project.repo,
+                'issue_state': items[0],
+                'pr_state': items[1],
+            },
+        )
 
-            entry[f'{items[0].lower()}_issues'] = result['data']['repository'][
-                'issues'
-            ]['totalCount']
-            entry[f'{items[1].lower()}_pull_requests'] = result['data']['repository'][
-                'pullRequests'
-            ]['totalCount']
+        entry[f'{items[0].lower()}_issues'] = result['data']['repository'][
+            'issues'
+        ]['totalCount']
+        entry[f'{items[1].lower()}_pull_requests'] = result['data']['repository'][
+            'pullRequests'
+        ]['totalCount']
 
         data.append(entry)
+    return data
 
-    df = pd.DataFrame(data)
 
+@task
+def merge_data(data):
+    entries = itertools.chain(*data)
+    df = pd.DataFrame(entries)
+    df['time'] = df.time.dt.round('H')
+    df['hour'] = df.time.dt.hour
+    df['day'] = df.time.dt.day
+    df['week'] = df.time.dt.isocalendar().week
+    df['weekend'] = df.time.dt.weekday.map(lambda x: 'weekday' if x < 5 else 'weekend')
+    df['quarter'] = df.time.dt.quarter.map({1: 'Q1: Jan - Mar', 2: 'Q2: Apr - Jun', 3: 'Q3: Jul - Sep', 4: 'Q4: Oct - Dec'})
+    return df
+
+
+@task
+def save_data(data, data_file):
     try:
-        old_df = pd.read_csv(data_file)
+        df = pd.read_json(data_file, parse_dates=['time'])
     except Exception:
-        old_df = pd.DataFrame()
+        df = pd.DataFrame()
 
-    print(f'Length of Old dataframe: {len(old_df)}')
 
-    if old_df.empty:
-        pass
-    else:
-        df = pd.concat([old_df, df])
-    df = df.drop_duplicates(subset=['project', 'timestamp']).sort_values(by='timestamp')
-    print(df.head())
-    print(df.tail())
-    print(f'Length of dataframe: {len(df)}')
-    df.to_csv(data_file, index=False)
-    df.to_json('./data/test.json', orient='records')
-    print(f'File size in bytes: {data_file.stat().st_size}')
+    if not data.empty:
+        data = pd.concat([df, data])
+    data = data.drop_duplicates(subset=['project', 'time']).sort_values(by='time')
+    data.to_json(data_file, orient='records')
+
+
+if __name__ == '__main__':
+
+    with Flow('get_data') as flow:
+
+        Project = collections.namedtuple('Project', ['org', 'repo'])
+        projects = [
+        Project('pydata', 'xarray'),
+        Project('dask', 'dask'),
+        Project('dask', 'distributed'),
+        Project('numpy', 'numpy'),
+        Project('pandas-dev', 'pandas'),
+        Project('jupyterlab', 'jupyterlab'),
+        Project('matplotlib', 'matplotlib'),
+    ][:2]
+
+        time =  datetime.datetime.now()
+        data = get_repo_data.map(project=projects, time=unmapped(time))
+        data = merge_data(data)
+        save_data(data,data_file = pathlib.Path('./data/data.json').absolute())
+    output = flow.run()
