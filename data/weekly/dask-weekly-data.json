@@ -420,12 +420,12 @@
     "count":96
   },
   {
-    "date":1635811200000,
+    "date":1635897600000,
     "type":"open_issues",
-    "count":633
+    "count":631
   },
   {
-    "date":1635811200000,
+    "date":1635897600000,
     "type":"open_pull_requests",
     "count":95
   }
