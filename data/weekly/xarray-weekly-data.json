@@ -420,13 +420,13 @@
     "count":113
   },
   {
-    "date":1635897600000,
+    "date":1635984000000,
     "type":"open_issues",
-    "count":790
+    "count":791
   },
   {
-    "date":1635897600000,
+    "date":1635984000000,
     "type":"open_pull_requests",
-    "count":108
+    "count":110
   }
 ]
