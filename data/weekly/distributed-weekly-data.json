@@ -422,11 +422,11 @@
   {
     "date":1636070400000,
     "type":"open_issues",
-    "count":688
+    "count":690
   },
   {
     "date":1636070400000,
     "type":"open_pull_requests",
-    "count":184
+    "count":183
   }
 ]
