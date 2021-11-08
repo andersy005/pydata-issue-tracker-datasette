@@ -55,6 +55,10 @@ jobs:
           # Fetch issues
           github-to-sqlite issues xarray.db pydata/xarray
           sqlite-utils tables --counts xarray.db
+          # Fetch releases
+          github-to-sqlite releases xarray.db pydata/xarray
+          # Fetch tags
+          github-to-sqlite tags xarray.db pydata/xarray
           # Rebuild FTS tables
           sqlite-utils rebuild-fts xarray.db
           # Populate _analyze_tables_ table
@@ -64,6 +68,8 @@ jobs:
         run: |
           cd xarray-db
           cp ../xarray.db .
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
           git add xarray.db
           git commit --amend --no-edit
           git push --force
