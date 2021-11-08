@@ -14,6 +14,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         name: Check out repo
+      - name: Checkout xarray-db
+        uses: actions/checkout@v2
+        with:
+          repository: andersy005/xarray-db
+          path: xarray-db
+          token: ${{ secrets.GH_TOKEN }}
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -30,26 +36,38 @@ jobs:
         run: |
           echo "{\"github_personal_token\": \"$GITHUB_ACCESS_TOKEN\"}" > auth.json
 
+      - name: Download previous database unless REBUILD in commit message
+        if: |-
+          !contains(github.event.head_commit.message, 'REBUILD')
+        run: curl --fail -o xarray.db https://raw.githubusercontent.com/andersy005/xarray-db/main/xarray.db
+        continue-on-error: true
+
       - name: Fetch data
         run: |
           # # Scrape dependents
-          # github-to-sqlite scrape-dependents github.db pydata/xarray -v
+          # github-to-sqlite scrape-dependents xarray.db pydata/xarray -v
           # Fetch stargazers
-          github-to-sqlite stargazers github.db pydata/xarray
+          github-to-sqlite stargazers xarray.db pydata/xarray
           # Fetch contributors
-          github-to-sqlite contributors github.db pydata/xarray
+          github-to-sqlite contributors xarray.db pydata/xarray
           # Fetch pull-requests
-          github-to-sqlite pull-requests github.db pydata/xarray
+          github-to-sqlite pull-requests xarray.db pydata/xarray
           # Fetch issues
-          github-to-sqlite issues github.db pydata/xarray
-          sqlite-utils tables --counts github.db
-          # Delete email addresses from raw_authors
-          sqlite-utils github.db "update raw_authors set email = ''"
+          github-to-sqlite issues xarray.db pydata/xarray
+          sqlite-utils tables --counts xarray.db
           # Rebuild FTS tables
-          sqlite-utils rebuild-fts github.db
+          sqlite-utils rebuild-fts xarray.db
           # Populate _analyze_tables_ table
-          sqlite-utils analyze-tables github.db --save
+          sqlite-utils analyze-tables xarray.db --save
+
+      - name: Save xarray.db to andersy005/xarray-db
+        run: |
+          cd xarray-db
+          cp xarray.db .
+          git add xarray.db
+          git commit --amend --no-edit
+          git push --force
 
       - uses: actions/upload-artifact@v2
         with:
-          path: github.db
+          path: xarray.db
