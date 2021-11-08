@@ -44,8 +44,8 @@ jobs:
 
       - name: Fetch data
         run: |
-          # # Scrape dependents
-          # github-to-sqlite scrape-dependents xarray.db pydata/xarray -v
+          # Scrape dependents
+          github-to-sqlite scrape-dependents xarray.db pydata/xarray -v
           # Fetch stargazers
           github-to-sqlite stargazers xarray.db pydata/xarray
           # Fetch contributors
