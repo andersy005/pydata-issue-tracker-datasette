@@ -26,7 +26,7 @@ jobs:
 
       - name: Create auth.json
         env:
-          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           echo "{\"github_personal_token\": \"$GITHUB_ACCESS_TOKEN\"}" > auth.json
 
