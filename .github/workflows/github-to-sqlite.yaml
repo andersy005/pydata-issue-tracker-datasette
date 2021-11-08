@@ -11,6 +11,7 @@ on:
 jobs:
   scheduled:
     runs-on: ubuntu-latest
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v2
         name: Check out repo
@@ -20,6 +21,10 @@ jobs:
           repository: andersy005/xarray-db
           path: xarray-db
           token: ${{ secrets.GH_TOKEN }}
+      - name: Set up Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
@@ -77,3 +82,20 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           path: xarray.db
+
+      - name: Deploy to Heroku
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |-
+          export LATEST_DATASETTE=`curl -s "https://api.github.com/repos/simonw/datasette/commits/main" | jq -r .sha`
+          npm install -g heroku
+          heroku plugins:install heroku-builds
+          datasette publish heroku xarray.db \
+            # -m metadata.json \
+            -n pydata-datasette \
+            --install=datasette-vega \
+            --install=datasette-jellyfish \
+            --install=datasette-graphql \
+            --install='datasette-copyable>=0.2' \
+            --version-note=$LATEST_DATASETTE \
+            --branch=$LATEST_DATASETTE
