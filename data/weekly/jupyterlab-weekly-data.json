@@ -428,5 +428,15 @@
     "date":1636329600000,
     "type":"open_pull_requests",
     "count":82
+  },
+  {
+    "date":1636329600000,
+    "type":"open_issues",
+    "count":1890
+  },
+  {
+    "date":1636329600000,
+    "type":"open_pull_requests",
+    "count":82
   }
 ]
