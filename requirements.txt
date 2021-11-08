@@ -1,3 +1,7 @@
 pandas
 requests
 prefect
+github-to-sqlite
+datasette
+bs4
+sqlite-utils>=3.1
