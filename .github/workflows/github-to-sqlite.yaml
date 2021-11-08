@@ -63,7 +63,7 @@ jobs:
       - name: Save xarray.db to andersy005/xarray-db
         run: |
           cd xarray-db
-          cp xarray.db .
+          cp ../xarray.db .
           git add xarray.db
           git commit --amend --no-edit
           git push --force
