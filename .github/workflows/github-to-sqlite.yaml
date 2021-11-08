@@ -32,8 +32,12 @@ jobs:
 
       - name: Fetch data
         run: |
-          # Scrape dependents
-          github-to-sqlite scrape-dependents github.db pydata/xarray -v
+          # # Scrape dependents
+          # github-to-sqlite scrape-dependents github.db pydata/xarray -v
+          # Fetch stargazers
+          github-to-sqlite stargazers github.db pydata/xarray
+          # Fetch contributors
+          github-to-sqlite contributors github.db pydata/xarray
           # Fetch pull-requests
           github-to-sqlite pull-requests github.db pydata/xarray
           # Fetch issues
@@ -41,8 +45,6 @@ jobs:
           sqlite-utils tables --counts github.db
           # Delete email addresses from raw_authors
           sqlite-utils github.db "update raw_authors set email = ''"
-          # Fetch emojis
-          github-to-sqlite emojis github.db --fetch
           # Rebuild FTS tables
           sqlite-utils rebuild-fts github.db
           # Populate _analyze_tables_ table
