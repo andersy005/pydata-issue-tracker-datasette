@@ -90,9 +90,7 @@ jobs:
           export LATEST_DATASETTE=`curl -s "https://api.github.com/repos/simonw/datasette/commits/main" | jq -r .sha`
           npm install -g heroku
           heroku plugins:install heroku-builds
-          datasette publish heroku xarray.db \
-            # -m metadata.json \
-            -n pydata-datasette \
+          datasette publish heroku xarray.db -n pydata-datasette \                                        ─╯
             --install=datasette-vega \
             --install=datasette-jellyfish \
             --install=datasette-graphql \
