@@ -91,6 +91,7 @@ jobs:
           npm install -g heroku
           heroku plugins:install heroku-builds
           datasette publish heroku xarray.db -n pydata-datasette \
+            --extra-options='--setting max_returned_rows 10000' \
             --install=datasette-vega \
             --install=datasette-jellyfish \
             --install=datasette-graphql \
