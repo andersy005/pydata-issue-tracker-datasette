@@ -44,8 +44,18 @@ jobs:
       - name: Download previous database unless REBUILD in commit message
         if: |-
           !contains(github.event.head_commit.message, 'REBUILD')
-        run: curl --fail -o xarray.db https://raw.githubusercontent.com/andersy005/xarray-db/main/xarray.db
+        run: |
+          curl --fail -o xarray.db https://pydata-datasette.herokuapp.com/xarray.db
         continue-on-error: true
+
+      - name: Collect data via GitHub API
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          prefect run -p scrape_pulls_and_issues.py
+          cd data/
+          csvs-to-sqlite open_pulls_and_issues.csv open_pulls_and_issues.db
+          sqlite-utils analyze-tables open_pulls_and_issues.db --save
 
       - name: Fetch data
         run: |
@@ -70,6 +80,7 @@ jobs:
           sqlite-utils analyze-tables xarray.db --save
 
       - name: Save xarray.db to andersy005/xarray-db
+        if: "!contains(github.event.head_commit.message, '[skip-publish]')"
         run: |
           cd xarray-db
           cp ../xarray.db .
@@ -80,17 +91,19 @@ jobs:
           git push --force
 
       - uses: actions/upload-artifact@v2
+        if: "!contains(github.event.head_commit.message, '[skip-publish]')"
         with:
           path: xarray.db
 
       - name: Deploy to Heroku
+        if: "!contains(github.event.head_commit.message, '[skip-publish]')"
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |-
           export LATEST_DATASETTE=`curl -s "https://api.github.com/repos/simonw/datasette/commits/main" | jq -r .sha`
           npm install -g heroku
           heroku plugins:install heroku-builds
-          datasette publish heroku xarray.db -n pydata-datasette \
+          datasette publish heroku xarray.db open_pulls_and_issues.db -n pydata-datasette \
             --extra-options='--setting max_returned_rows 10000' \
             --install=datasette-vega \
             --install=datasette-jellyfish \
