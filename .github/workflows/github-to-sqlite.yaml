@@ -53,8 +53,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           prefect run -p scrape_pulls_and_issues.py
-          cd data/
-          csvs-to-sqlite open_pulls_and_issues.csv open_pulls_and_issues.db
+          csvs-to-sqlite ./data/open_pulls_and_issues.csv open_pulls_and_issues.db
           sqlite-utils analyze-tables open_pulls_and_issues.db --save
 
       - name: Fetch data
