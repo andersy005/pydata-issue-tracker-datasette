@@ -78,17 +78,10 @@ def merge_data(data):
     return df
 
 
-@task
+@task(max_retries=3, retry_delay=datetime.timedelta(minutes=1))
 def save_data(data, data_file):
-    url = 'https://pydata-datasette.herokuapp.com/open_pulls_and_issues/pulls-and-issues.csv?_stream=on&_size=max'
-    try:
-        df = pd.read_csv(url, parse_dates=['time'])
-        try:
-            df = df.drop(columns=['rowid'])
-        except:
-            pass
-    except Exception:
-        df = pd.DataFrame()
+    url = 'https://pydata-datasette.herokuapp.com/open_pulls_and_issues/open_pulls_and_issues.csv?_stream=on&_size=max'
+    df = pd.read_csv(url, parse_dates=['time']).drop(columns=['rowid'])
     print(df.shape)
     if not df.empty:
         data = pd.concat([df, data])

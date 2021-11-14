@@ -83,16 +83,20 @@ jobs:
         run: |
           cd xarray-db
           cp ../xarray.db .
+          cp ../open_pulls_and_issues.db .
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
-          git add xarray.db
+          git add xarray.db open_pulls_and_issues.db
           git commit --amend --no-edit
           git push --force
 
       - uses: actions/upload-artifact@v2
-        if: "!contains(github.event.head_commit.message, '[skip-publish]')"
         with:
           path: xarray.db
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: open_pulls_and_issues.db
 
       - name: Deploy to Heroku
         if: "!contains(github.event.head_commit.message, '[skip-publish]')"
