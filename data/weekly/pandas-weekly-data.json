@@ -440,13 +440,13 @@
     "count":145
   },
   {
-    "date":1637193600000,
+    "date":1637280000000,
     "type":"open_issues",
-    "count":3410
+    "count":3415
   },
   {
-    "date":1637193600000,
+    "date":1637280000000,
     "type":"open_pull_requests",
-    "count":132
+    "count":137
   }
 ]
