@@ -1,8 +1,8 @@
 name: collect-data
 
 on:
-  schedule:
-    - cron: '0 0 * * *' # "At minute 0 past every 8th hour."
+  # schedule:
+  #   - cron: '0 0 * * *' # "At minute 0 past every 8th hour."
   workflow_dispatch:
   # push:
   #   branches:
