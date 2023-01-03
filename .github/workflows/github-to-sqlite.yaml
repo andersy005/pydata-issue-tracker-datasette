@@ -15,6 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         name: Check out repo
+      - name: Install flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@master
       - name: Checkout xarray-db
         uses: actions/checkout@v2
         with:
@@ -45,7 +47,7 @@ jobs:
         if: |-
           !contains(github.event.head_commit.message, 'REBUILD')
         run: |
-          curl --fail -o xarray.db https://pydata-datasette.herokuapp.com/xarray.db
+          curl --fail -o xarray.db https://pydata-datasette.fly.dev/xarray.db
         continue-on-error: true
 
       - name: Collect data via GitHub API
@@ -102,15 +104,14 @@ jobs:
           path: open_pulls_and_issues.db
           retention-days: 2
 
-      - name: Deploy to Heroku
+      - name: Deploy to fly.io
         if: "!contains(github.event.head_commit.message, '[skip-publish]')"
         env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
         run: |-
           export LATEST_DATASETTE=`curl -s "https://api.github.com/repos/simonw/datasette/commits/main" | jq -r .sha`
-          npm install -g heroku
-          heroku plugins:install heroku-builds
-          datasette publish heroku xarray.db open_pulls_and_issues.db -n pydata-datasette \
+          datasette install datasette-publish-fly
+          datasette publish fly xarray.db open_pulls_and_issues.db -n pydata-datasette \
             --extra-options='--setting max_returned_rows 10000' \
             --install=datasette-vega \
             --install=datasette-jellyfish \

@@ -10,4 +10,4 @@ This workflow uses the following projects:
 - https://github.com/simonw/csvs-to-sqlite
 - https://github.com/simonw/datasette
 
-Deployed to https://pydata-datasette.herokuapp.com/
+Deployed to https://pydata-datasette.fly.dev/

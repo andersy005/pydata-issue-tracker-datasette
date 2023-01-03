@@ -80,7 +80,7 @@ def merge_data(data):
 
 @task(max_retries=3, retry_delay=datetime.timedelta(minutes=1))
 def save_data(data, data_file):
-    url = 'https://pydata-datasette.herokuapp.com/open_pulls_and_issues/open_pulls_and_issues.csv?_stream=on&_size=max'
+    url = 'https://pydata-datasette.fly.dev/open_pulls_and_issues/open_pulls_and_issues.csv?_stream=on&_size=max'
     df = pd.read_csv(url, parse_dates=['time']).drop(columns=['rowid'])
     print(df.shape)
     if not df.empty:
