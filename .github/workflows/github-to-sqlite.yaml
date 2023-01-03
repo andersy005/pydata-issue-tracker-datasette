@@ -111,7 +111,7 @@ jobs:
         run: |-
           export LATEST_DATASETTE=`curl -s "https://api.github.com/repos/simonw/datasette/commits/main" | jq -r .sha`
           datasette install datasette-publish-fly
-          datasette publish fly xarray.db open_pulls_and_issues.db -n pydata-datasette \
+          datasette publish fly xarray.db open_pulls_and_issues.db --app pydata-datasette \
             --extra-options='--setting max_returned_rows 10000' \
             --install=datasette-vega \
             --install=datasette-jellyfish \
