@@ -108,8 +108,10 @@ jobs:
         if: "!contains(github.event.head_commit.message, '[skip-publish]')"
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |-
-          export LATEST_DATASETTE=`curl -s "https://api.github.com/repos/simonw/datasette/commits/main" | jq -r .sha`
+          #export LATEST_DATASETTE=`curl -s -H "Authorization: token $GITHUB_TOKEN" "https://api.github.com/repos/simonw/datasette/commits/main" | jq -r .sha`
+          export LATEST_DATASETTE=0.64.1
           datasette install datasette-publish-fly
           datasette publish fly xarray.db open_pulls_and_issues.db --app pydata-datasette \
             --extra-options='--setting max_returned_rows 10000' \
