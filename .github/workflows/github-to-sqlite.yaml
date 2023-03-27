@@ -116,7 +116,6 @@ jobs:
           datasette publish fly xarray.db open_pulls_and_issues.db --app pydata-datasette \
             --extra-options='--setting max_returned_rows 10000' \
             --install=datasette-vega \
-            --install=datasette-jellyfish \
             --install=datasette-graphql \
             --install='datasette-copyable>=0.2' \
             --version-note=$LATEST_DATASETTE \

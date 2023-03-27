@@ -3,7 +3,6 @@ csvs-to-sqlite
 datasette
 datasette-copyable
 datasette-graphql
-datasette-jellyfish
 datasette-vega
 github-to-sqlite
 Markdown
