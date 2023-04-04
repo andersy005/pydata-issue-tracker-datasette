@@ -1,18 +1,17 @@
-
-import requests
-import os
 import collections
-import pandas as pd
 import datetime
 import itertools
+import os
 import pathlib
-from prefect import Flow, task, unmapped, Parameter
-from prefect.triggers import all_successful
 
+import pandas as pd
+import prefect
+import requests
 
 headers = {'Authorization': f"token {os.environ['GH_TOKEN']}"}
 
-@task(max_retries=3, retry_delay=datetime.timedelta(minutes=1))
+
+@prefect.task(retries=3, retry_delay_seconds=10)
 def get_repo_data(project, time):
     def run_query(
         query, variables={}
@@ -57,9 +56,9 @@ def get_repo_data(project, time):
             },
         )
 
-        entry[f'{items[0].lower()}_issues'] = result['data']['repository'][
-            'issues'
-        ]['totalCount']
+        entry[f'{items[0].lower()}_issues'] = result['data']['repository']['issues'][
+            'totalCount'
+        ]
         entry[f'{items[1].lower()}_pull_requests'] = result['data']['repository'][
             'pullRequests'
         ]['totalCount']
@@ -68,7 +67,7 @@ def get_repo_data(project, time):
     return data
 
 
-@task
+@prefect.task
 def merge_data(data):
     entries = itertools.chain(*data)
     df = pd.DataFrame(entries)
@@ -77,11 +76,13 @@ def merge_data(data):
     df['day'] = df.time.dt.day
     df['week'] = df.time.dt.isocalendar().week
     df['weekend'] = df.time.dt.weekday.map(lambda x: 'weekday' if x < 5 else 'weekend')
-    df['quarter'] = df.time.dt.quarter.map({1: 'Q1: Jan - Mar', 2: 'Q2: Apr - Jun', 3: 'Q3: Jul - Sep', 4: 'Q4: Oct - Dec'})
+    df['quarter'] = df.time.dt.quarter.map(
+        {1: 'Q1: Jan - Mar', 2: 'Q2: Apr - Jun', 3: 'Q3: Jul - Sep', 4: 'Q4: Oct - Dec'}
+    )
     return df
 
 
-@task
+@prefect.task
 def save_data(data, data_file):
     try:
         df = pd.read_json(data_file, convert_dates=['time'])
@@ -92,44 +93,60 @@ def save_data(data, data_file):
         data = pd.concat([df, data])
     data = data.drop_duplicates(subset=['project', 'time']).sort_values(by='time')
     with open(data_file, 'w', encoding='utf-8') as outfile:
-      data.to_json(outfile, orient='records', indent=2, force_ascii=False)
+        data.to_json(outfile, orient='records', indent=2, force_ascii=False)
 
 
 def transform(row):
-    return [{'date': row.time.round('D'), 'type': 'open_issues', 'count': row.open_issues}, {'date': row.time.round('D'), 'type': 'open_pull_requests', 'count': row.open_pull_requests}]
+    return [
+        {'date': row.time.round('D'), 'type': 'open_issues', 'count': row.open_issues},
+        {
+            'date': row.time.round('D'),
+            'type': 'open_pull_requests',
+            'count': row.open_pull_requests,
+        },
+    ]
 
 
-
-@task
+@prefect.task
 def save_project_weekly_data(project, path):
     path = pathlib.Path(path)
-    columns= ['time', 'open_issues', 'open_pull_requests']
+    columns = ['time', 'open_issues', 'open_pull_requests']
     df = pd.read_json(path, convert_dates=['time'])
     data = df[df.project == f'{project.org}/{project.repo}']
     data = data[columns].groupby(data.time.dt.isocalendar().week).last()
-    results = pd.DataFrame(itertools.chain(*[transform(row) for _, row in data.iterrows()]))
+    results = pd.DataFrame(
+        itertools.chain(*[transform(row) for _, row in data.iterrows()])
+    )
     outdir = path.parent / 'weekly'
     outdir.mkdir(parents=True, exist_ok=True)
     data_file = f'{outdir}/{project.repo}-weekly-data.json'
     with open(data_file, 'w', encoding='utf-8') as outfile:
-      results.to_json(outfile, orient='records', indent=2, force_ascii=False)
+        results.to_json(outfile, orient='records', indent=2, force_ascii=False)
 
 
-with Flow('get_data') as flow:
-
+@prefect.flow
+def get_data():
     Project = collections.namedtuple('Project', ['org', 'repo'])
     projects = [
-    Project('pydata', 'xarray'),
-    Project('dask', 'dask'),
-    Project('dask', 'distributed'),
-    Project('numpy', 'numpy'),
-    Project('pandas-dev', 'pandas'),
-    Project('jupyterlab', 'jupyterlab'),
-    Project('matplotlib', 'matplotlib'),
-]
-    path = Parameter('path', default=pathlib.Path('./data/data.json').absolute())
-    time =  datetime.datetime.now()
-    data = get_repo_data.map(project=projects, time=unmapped(time))
+        Project('pydata', 'xarray'),
+        Project('dask', 'dask'),
+        Project('dask', 'distributed'),
+        Project('numpy', 'numpy'),
+        Project('pandas-dev', 'pandas'),
+        Project('jupyterlab', 'jupyterlab'),
+        Project('matplotlib', 'matplotlib'),
+    ]
+    path = pathlib.Path('./data/data.json').absolute()
+    time = datetime.datetime.now()
+    data = get_repo_data.map(project=projects, time=prefect.unmapped(time))
     df = merge_data(data)
-    x = save_data(df, data_file = path)
-    save_project_weekly_data.map(project=projects, path=unmapped(path), upstream_tasks=[unmapped(x)])
+    x = save_data(df, data_file=path)
+    save_project_weekly_data.map(
+        project=projects,
+        path=prefect.unmapped(path),
+        upstream_tasks=[prefect.unmapped(x)],
+    )
+
+
+if __name__ == '__main__':
+    get_data()

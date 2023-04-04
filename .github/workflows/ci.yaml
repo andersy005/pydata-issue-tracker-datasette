@@ -28,7 +28,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          prefect run -p getdata.py
+          python getdata.py
 
       - name: Commit files
         run: |
