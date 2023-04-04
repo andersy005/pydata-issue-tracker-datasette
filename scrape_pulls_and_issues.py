@@ -3,6 +3,7 @@ import datetime
 import itertools
 import os
 import pathlib
+import urllib.error
 
 import pandas as pd
 import prefect
@@ -89,13 +90,16 @@ def merge_data(data):
     retry_delay_seconds=10,
 )
 def save_data(data, data_file):
-    url = 'https://pydata-datasette.fly.dev/open_pulls_and_issues/open_pulls_and_issues.csv?_stream=on&_size=max'
-    df = pd.read_csv(url, parse_dates=['time']).drop(columns=['rowid'])
+    try:
+        url = 'https://pydata-datasette.fly.dev/open_pulls_and_issues/open_pulls_and_issues.csv?_stream=on&_size=max'
+        df = pd.read_csv(url, parse_dates=['time']).drop(columns=['rowid'])
+    except urllib.error.HTTPError:
+        df = pd.DataFrame()
     print(df.shape)
     if not df.empty:
         data = pd.concat([df, data])
-    data = data.drop_duplicates(subset=['project', 'time']).sort_values(by='time')
-    data.to_csv(data_file, index=False)
+        data = data.drop_duplicates(subset=['project', 'time']).sort_values(by='time')
+        data.to_csv(data_file, index=False)
 
 
 @prefect.flow
