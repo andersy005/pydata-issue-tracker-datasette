@@ -12,7 +12,7 @@ headers = {'Authorization': f"token {os.environ['GH_TOKEN']}"}
 
 
 @prefect.task(retries=3, retry_delay_seconds=10)
-def get_repo_data(project, time):
+def get_repo_data(project, time):  # sourcery skip: raise-specific-error
     def run_query(
         query, variables={}
     ):  # A simple function to use requests.post to make the API call. Note the json= section.

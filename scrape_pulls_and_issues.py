@@ -1,17 +1,21 @@
-
-import requests
-import os
 import collections
-import pandas as pd
 import datetime
 import itertools
+import os
 import pathlib
-from prefect import Flow, task, unmapped, Parameter
+
+import pandas as pd
+import prefect
+import requests
 
 headers = {'Authorization': f"token {os.environ['GH_TOKEN']}"}
 
-@task(max_retries=3, retry_delay=datetime.timedelta(minutes=1))
-def get_repo_data(project, time):
+
+@prefect.task(
+    retries=3,
+    retry_delay_seconds=10,
+)
+def get_repo_data(project, time):  # sourcery skip: raise-specific-error
     def run_query(
         query, variables={}
     ):  # A simple function to use requests.post to make the API call. Note the json= section.
@@ -55,9 +59,9 @@ def get_repo_data(project, time):
             },
         )
 
-        entry[f'{items[0].lower()}_issues'] = result['data']['repository'][
-            'issues'
-        ]['totalCount']
+        entry[f'{items[0].lower()}_issues'] = result['data']['repository']['issues'][
+            'totalCount'
+        ]
         entry[f'{items[1].lower()}_pull_requests'] = result['data']['repository'][
             'pullRequests'
         ]['totalCount']
@@ -66,7 +70,7 @@ def get_repo_data(project, time):
     return data
 
 
-@task
+@prefect.task
 def merge_data(data):
     entries = itertools.chain(*data)
     df = pd.DataFrame(entries)
@@ -74,11 +78,16 @@ def merge_data(data):
     df['day'] = df.time.dt.day
     df['week'] = df.time.dt.isocalendar().week
     df['weekend'] = df.time.dt.weekday.map(lambda x: 'weekday' if x < 5 else 'weekend')
-    df['quarter'] = df.time.dt.quarter.map({1: 'Q1: Jan - Mar', 2: 'Q2: Apr - Jun', 3: 'Q3: Jul - Sep', 4: 'Q4: Oct - Dec'})
+    df['quarter'] = df.time.dt.quarter.map(
+        {1: 'Q1: Jan - Mar', 2: 'Q2: Apr - Jun', 3: 'Q3: Jul - Sep', 4: 'Q4: Oct - Dec'}
+    )
     return df
 
 
-@task(max_retries=3, retry_delay=datetime.timedelta(minutes=1))
+@prefect.task(
+    retries=3,
+    retry_delay_seconds=10,
+)
 def save_data(data, data_file):
     url = 'https://pydata-datasette.fly.dev/open_pulls_and_issues/open_pulls_and_issues.csv?_stream=on&_size=max'
     df = pd.read_csv(url, parse_dates=['time']).drop(columns=['rowid'])
@@ -89,20 +98,26 @@ def save_data(data, data_file):
     data.to_csv(data_file, index=False)
 
 
-with Flow('get_data') as flow:
+@prefect.flow
+def get_data():
 
     Project = collections.namedtuple('Project', ['org', 'repo'])
     projects = [
-    Project('pydata', 'xarray'),
-    Project('dask', 'dask'),
-    Project('dask', 'distributed'),
-    Project('numpy', 'numpy'),
-    Project('pandas-dev', 'pandas'),
-    Project('jupyterlab', 'jupyterlab'),
-    Project('matplotlib', 'matplotlib'),
-]
-    path = Parameter('path', default=pathlib.Path('./data/open_pulls_and_issues.csv').absolute())
-    time =  datetime.datetime.now()
-    data = get_repo_data.map(project=projects, time=unmapped(time))
+        Project('pydata', 'xarray'),
+        Project('dask', 'dask'),
+        Project('dask', 'distributed'),
+        Project('numpy', 'numpy'),
+        Project('pandas-dev', 'pandas'),
+        Project('jupyterlab', 'jupyterlab'),
+        Project('matplotlib', 'matplotlib'),
+    ]
+    path = pathlib.Path('./data/open_pulls_and_issues.csv').absolute()
+    time = datetime.datetime.now()
+    data = get_repo_data.map(project=projects, time=prefect.unmapped(time))
     df = merge_data(data)
-    save_data(df, data_file = path)
+    save_data(df, data_file=path)
+    save_data(df, data_file=path)
+
+
+if __name__ == '__main__':
+    get_data()
