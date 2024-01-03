@@ -7,6 +7,5 @@ datasette-vega
 github-to-sqlite
 Markdown
 pandas
-prefect>=2
 requests
 sqlite-utils>=3.1
