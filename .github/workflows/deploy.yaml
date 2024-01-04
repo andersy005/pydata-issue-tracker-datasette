@@ -121,5 +121,6 @@ jobs:
             --install=datasette-render-images \
             --install=datasette-graphql \
             --install=datasette-atom \
+            --install=datasette-scale-to-zero \
             --version-note=$LATEST_DATASETTE \
             --branch=$LATEST_DATASETTE

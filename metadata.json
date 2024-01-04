@@ -1,6 +1,11 @@
 {
   "about": "xarray-datasette",
   "about_url": "https://github.com/andersy005/xarray-datasette",
+  "plugins": {
+    "datasette-scale-to-zero": {
+      "duration": "10m"
+    }
+  },
   "databases": {
     "github": {
       "tables": {
