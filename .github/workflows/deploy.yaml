@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   scheduled:
     if: "!contains(github.event.head_commit.message, '[skip-ci]')"
@@ -76,8 +80,8 @@ jobs:
 
           done
 
-          # Scrape dependents
-          github-to-sqlite scrape-dependents github.db pydata/xarray -v
+          # # Scrape dependents
+          # github-to-sqlite scrape-dependents github.db pydata/xarray -v
           sqlite-utils tables --counts github.db
           # Delete email addresses from raw_authors
           sqlite-utils github.db "update raw_authors set email = ''"
