@@ -110,7 +110,6 @@ jobs:
           datasette publish fly github.db --app xarray-datasette \
             --extra-options='--setting max_returned_rows 10000' \
             -m metadata.json \
-            --service github-to-sqlite \
             --install=datasette-search-all>=0.3 \
             --install=datasette-render-markdown>=1.1.2 \
             --install=datasette-pretty-json>=0.2.2 \
