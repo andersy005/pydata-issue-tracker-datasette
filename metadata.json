@@ -1,0 +1,119 @@
+{
+  "about": "xarray-datasette",
+  "about_url": "https://github.com/andersy005/xarray-datasette",
+  "databases": {
+    "github": {
+      "tables": {
+        "commits": {
+          "facets": ["repo", "author"],
+          "sort_desc": "author_date"
+        },
+        "issue_comments": {
+          "facets": ["author_association", "user", "issue"],
+          "plugins": {
+            "datasette-render-markdown": {
+              "columns": ["body"],
+              "extra_attrs": {
+                "div": ["class"],
+                "img": ["src"],
+                "input": ["type", "disabled", "checked"],
+                "span": ["class"]
+              },
+              "extra_tags": [
+                "img",
+                "hr",
+                "br",
+                "details",
+                "summary",
+                "input",
+                "div",
+                "span"
+              ]
+            }
+          },
+          "sort_desc": "updated_at"
+        },
+        "issues": {
+          "facets": ["state", "repo", "type"],
+          "plugins": {
+            "datasette-render-markdown": {
+              "columns": ["body"],
+              "extra_attrs": {
+                "div": ["class"],
+                "img": ["src"],
+                "input": ["type", "disabled", "checked"],
+                "span": ["class"]
+              },
+              "extra_tags": [
+                "img",
+                "hr",
+                "br",
+                "details",
+                "summary",
+                "input",
+                "div",
+                "span"
+              ]
+            }
+          },
+          "sort_desc": "updated_at"
+        },
+        "milestones": {
+          "facets": ["repo", "state"],
+          "plugins": {
+            "datasette-render-markdown": {
+              "columns": ["description"],
+              "extra_attrs": {
+                "div": ["class"],
+                "img": ["src"],
+                "input": ["type", "disabled", "checked"],
+                "span": ["class"]
+              },
+              "extra_tags": [
+                "img",
+                "hr",
+                "br",
+                "details",
+                "summary",
+                "input",
+                "div",
+                "span"
+              ]
+            }
+          }
+        },
+        "releases": {
+          "plugins": {
+            "datasette-render-markdown": {
+              "columns": ["body"],
+              "extra_attrs": {
+                "div": ["class"],
+                "img": ["src"],
+                "input": ["type", "disabled", "checked"],
+                "span": ["class"]
+              },
+              "extra_tags": [
+                "img",
+                "hr",
+                "br",
+                "details",
+                "summary",
+                "input",
+                "div",
+                "span"
+              ]
+            }
+          },
+          "sort_desc": "created_at"
+        },
+        "repos": {
+          "sort_desc": "updated_at"
+        },
+        "users": {
+          "label_column": "login"
+        }
+      }
+    }
+  },
+  "title": "xarray-datasette"
+}
